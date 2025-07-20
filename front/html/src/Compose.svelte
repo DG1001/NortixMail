@@ -62,6 +62,10 @@
 				<span class="from-address">{selectedAddress}{domainName}</span>
 			</div>
 
+			<div class="warning-notice">
+				⚠️ <strong>Note:</strong> This email will be sent via your configured SMTP server. The recipient will see your SMTP server's email address as the sender, not the disposable address above.
+			</div>
+
 			<div class="form-row">
 				<label for="to">To:</label>
 				<input id="to" bind:value={toAddr} placeholder="recipient@example.com" type="email" required>
@@ -148,6 +152,16 @@
 		flex-direction: column;
 	}
 
+	.warning-notice {
+		background-color: #fff3cd;
+		border: 1px solid #ffeaa7;
+		border-radius: 4px;
+		padding: 10px;
+		margin-bottom: 15px;
+		font-size: 0.9rem;
+		color: #856404;
+	}
+
 	.form-row label {
 		font-weight: bold;
 		margin-bottom: 5px;
@@ -222,6 +236,12 @@
 			background-color: rgb(15,15,15);
 			color: white;
 			border: 1px solid #555;
+		}
+
+		.warning-notice {
+			background-color: #3d3d00;
+			border-color: #666600;
+			color: #ffff99;
 		}
 	}
 </style>
