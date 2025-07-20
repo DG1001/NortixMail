@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import f from './helper.js'
 	import dialog from './lib/dialog.js'
+	import Compose from './Compose.svelte'
 	dialog.init();
 
 	let domainName = "";
@@ -10,20 +11,63 @@
 	let selectedAddress = null;
 
 	let mails = [];
+	let sentMails = [];
 	let page = 1;
-	let viewType = "mails";
+	let viewType = "mails"; // "mails", "sent", "mailData"
+	let showCompose = false;
 
 	let mailDataSender;
 	let mailDataSubject;
 
 	function refreshMails(){
 
-		f.fetchPost('/mails', {addr: selectedAddress, page: page}, (data) => {
+		if (viewType === "sent") {
+			f.fetchPost('/sentMails', {addr: selectedAddress, page: page}, (data) => {
+				sentMails = data;
+			});
+		} else {
+			f.fetchPost('/mails', {addr: selectedAddress, page: page}, (data) => {
+				mails = data;
+			});
+		}
 
-			mails = data;
+	}
 
-		});
+	function showSentEmails(){
+		viewType = "sent";
+		page = 1;
+		refreshMails();
+	}
 
+	function showInboxEmails(){
+		viewType = "mails";
+		page = 1;
+		refreshMails();
+	}
+
+	function openCompose(){
+		showCompose = true;
+	}
+
+	function closeCompose(){
+		showCompose = false;
+	}
+
+	function forwardEmail(mailId){
+		let targetAddr = prompt("Enter email address to forward to:");
+		if (targetAddr && targetAddr.trim()) {
+			f.fetchPost('/forwardEmail', {
+				mailId: mailId,
+				targetAddr: targetAddr.trim(),
+				sourceAddr: selectedAddress
+			}, (response) => {
+				if (response.success) {
+					dialog.alrt("Email forwarded successfully!");
+				} else {
+					dialog.alrt("Failed to forward email: " + (response.error || "Unknown error"));
+				}
+			});
+		}
 	}
 
 	function selectedAddressChange(){
@@ -126,7 +170,8 @@
 
 	function nextPage(){
 
-		if(mails.length > 0){
+		let currentList = viewType === "sent" ? sentMails : mails;
+		if(currentList.length > 0){
 			page += 1;
 			refreshMails();
 		}
@@ -186,7 +231,7 @@
 		<!--Put a div so that there will be a gap from the flex at the top of the page-->
 		<div></div>
 		
-		<div class="adaptWidthSmall" style="display: flex; align-items: center; flex-wrap: wrap">
+		<div class="adaptWidthSmall" style="display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
 
 			<select bind:value={selectedAddress} on:change={selectedAddressChange} style="flex: 1">
 
@@ -200,8 +245,14 @@
 
 			<span>{domainName}</span>
 
-			<button on:keypress={copyClicked} on:click={copyClicked} style="margin-left: 10px; padding-top: 0px; padding-bottom: 0px">Copy</button>
+			<button on:keypress={copyClicked} on:click={copyClicked} style="padding-top: 0px; padding-bottom: 0px">Copy</button>
+			<button on:click={openCompose} style="padding-top: 0px; padding-bottom: 0px; background-color: #007bff; color: white;">Compose</button>
 
+		</div>
+
+		<div class="adaptWidthSmall" style="display: flex; gap: 10px; margin-bottom: 10px;">
+			<button on:click={showInboxEmails} class:active={viewType === "mails"} class="tab-btn">Inbox</button>
+			<button on:click={showSentEmails} class:active={viewType === "sent"} class="tab-btn">Sent</button>
 		</div>
 
 		<div id="mailList" class="fillWidth">
@@ -220,7 +271,37 @@
 
 						</div>
 
-						<input data-id={mail.id} on:keypress={deleteClicked} on:click={deleteClicked} type="image" src="trashIcon.svg" alt="X" style="width: 2rem; height: 2rem; padding: 1rem">
+						<div style="display: flex; gap: 10px; align-items: center;">
+							<button on:click={(e) => {e.stopPropagation(); forwardEmail(mail.id);}} style="padding: 5px 10px; font-size: 0.8rem;">Forward</button>
+							<input data-id={mail.id} on:keypress={deleteClicked} on:click={deleteClicked} type="image" src="trashIcon.svg" alt="X" style="width: 2rem; height: 2rem; padding: 1rem">
+						</div>
+
+					</div>
+					
+					<!--hr size inside flex is 0, gotta wrap with div, not sure why-->
+					<div>
+						<hr>
+					</div>
+
+				{/each}
+
+			{/if}
+
+			{#if viewType == 'sent'}
+
+				{#each sentMails as mail}
+
+					<div style="display: flex; align-items: center; justify-content: space-between; padding: 10px;">
+
+						<div> 
+
+							<span><strong>To:</strong> {mail.to_addr}</span>
+							<div></div>
+							<span>{mail.subject}</span>
+							<div></div>
+							<small style="color: #666;">{new Date(mail.sent_at).toLocaleString()}</small>
+
+						</div>
 
 					</div>
 					
@@ -248,7 +329,10 @@
 				</div>
 
 				<div style="height: 10px;"></div>
-				<button on:click={backClicked}>Back</button>
+				<div style="display: flex; gap: 10px;">
+					<button on:click={backClicked}>Back</button>
+					<button on:click={() => forwardEmail(mails.find(m => m.sender === mailDataSender && m.subject === mailDataSubject)?.id)}>Forward</button>
+				</div>
 
 			{/if}
 
@@ -266,5 +350,38 @@
 		<div></div>
 
 	</div>
+
+	{#if showCompose}
+		<Compose {selectedAddress} {domainName} onClose={closeCompose} />
+	{/if}
 	
 </main>
+
+<style>
+	.tab-btn {
+		padding: 8px 16px;
+		border: 1px solid #ccc;
+		background-color: #f8f9fa;
+		cursor: pointer;
+		border-radius: 4px 4px 0 0;
+	}
+
+	.tab-btn.active {
+		background-color: #007bff;
+		color: white;
+		border-color: #007bff;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		.tab-btn {
+			background-color: #333;
+			color: white;
+			border-color: #555;
+		}
+
+		.tab-btn.active {
+			background-color: #007bff;
+			border-color: #007bff;
+		}
+	}
+</style>

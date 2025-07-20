@@ -1,4 +1,11 @@
 {
 	"MailCountPerPage" : 10,
-	"MailRefreshInterval" : 3
+	"MailRefreshInterval" : 3,
+	"SMTPOutbound": {
+		"host": "localhost",
+		"port": 587,
+		"secure": false,
+		"maxRetries": 3
+	},
+	"ForwardingEnabled": true
 }

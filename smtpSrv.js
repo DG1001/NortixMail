@@ -4,10 +4,16 @@ import { simpleParser } from 'mailparser'
 import fs from 'fs'
 import path from 'path'
 import h from './helper.js'
+import config from './config.js'
+import smtpClient from './smtpClient.js'
+import domain from './domain.js'
 
 let mod = {
 
 	start: function(db , port){
+
+		smtpClient.init();
+		let domainName = domain.getDomainName();
 
 		let opt = {
 
@@ -38,6 +44,25 @@ let mod = {
 
 								let id = h.randomID();
 								db.prepare("INSERT INTO mail (id, recipient, sender, subject, content) VALUES (?, ?, ?, ?, ?)").run(id, recipientName, sender, subject, content);
+								
+								if (config.getConfig("ForwardingEnabled")) {
+									try {
+										let forwardingRules = db.prepare("SELECT target_addr FROM forwarding_rules WHERE source_addr = ? AND auto_forward = 1").all(recipientName);
+										
+										for (let rule of forwardingRules) {
+											try {
+												let originalMail = { sender, subject, content };
+												await smtpClient.forwardEmail(originalMail, rule.target_addr, recipientName, domainName);
+												console.log(`Auto-forwarded email from ${recipientName} to ${rule.target_addr}`);
+											} catch (forwardErr) {
+												console.log(`Auto-forward failed for ${recipientName} -> ${rule.target_addr}:`, forwardErr.message);
+											}
+										}
+									} catch (forwardingErr) {
+										console.log("Auto-forwarding check failed:", forwardingErr);
+									}
+								}
+								
 								break;
 
 							}

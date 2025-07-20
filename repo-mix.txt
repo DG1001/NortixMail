@@ -1,0 +1,1924 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+The content has been processed where security check has been disabled.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Security check has been disabled - content may contain sensitive information
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+data/
+  config.json
+front/
+  .vscode/
+    extensions.json
+  html/
+    public/
+      dialog.css
+      trashIcon.svg
+    src/
+      lib/
+        dialog.js
+      helper.js
+      index.js
+      index.svelte
+      layout.css
+      manage.js
+      manage.svelte
+      style.css
+      vite-env.d.ts
+    index.html
+    manage.html
+  .gitignore
+  jsconfig.json
+  package.json
+  README.md
+  svelte.config.js
+  vite.config.js
+.gitignore
+config.js
+database.js
+docker-compose.yaml
+Dockerfile
+domain.js
+helper.js
+httpSrv.js
+LICENSE
+main.js
+package.json
+README.md
+smtpSrv.js
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="data/config.json">
+{
+	"MailCountPerPage" : 10,
+	"MailRefreshInterval" : 3
+}
+</file>
+
+<file path="front/.vscode/extensions.json">
+{
+  "recommendations": ["svelte.svelte-vscode"]
+}
+</file>
+
+<file path="front/html/public/dialog.css">
+#dialogBox {
+	
+	background-color: rgb(255,255,255);
+
+}
+</file>
+
+<file path="front/html/public/trashIcon.svg">
+<svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 456 511.82"><path fill="#FD3B3B" d="M48.42 140.13h361.99c17.36 0 29.82 9.78 28.08 28.17l-30.73 317.1c-1.23 13.36-8.99 26.42-25.3 26.42H76.34c-13.63-.73-23.74-9.75-25.09-24.14L20.79 168.99c-1.74-18.38 9.75-28.86 27.63-28.86zM24.49 38.15h136.47V28.1c0-15.94 10.2-28.1 27.02-28.1h81.28c17.3 0 27.65 11.77 27.65 28.01v10.14h138.66c.57 0 1.11.07 1.68.13 10.23.93 18.15 9.02 18.69 19.22.03.79.06 1.39.06 2.17v42.76c0 5.99-4.73 10.89-10.62 11.19-.54 0-1.09.03-1.63.03H11.22c-5.92 0-10.77-4.6-11.19-10.38 0-.72-.03-1.47-.03-2.23v-39.5c0-10.93 4.21-20.71 16.82-23.02 2.53-.45 5.09-.37 7.67-.37zm83.78 208.38c-.51-10.17 8.21-18.83 19.53-19.31 11.31-.49 20.94 7.4 21.45 17.57l8.7 160.62c.51 10.18-8.22 18.84-19.53 19.32-11.32.48-20.94-7.4-21.46-17.57l-8.69-160.63zm201.7-1.74c.51-10.17 10.14-18.06 21.45-17.57 11.32.48 20.04 9.14 19.53 19.31l-8.66 160.63c-.52 10.17-10.14 18.05-21.46 17.57-11.31-.48-20.04-9.14-19.53-19.32l8.67-160.62zm-102.94.87c0-10.23 9.23-18.53 20.58-18.53 11.34 0 20.58 8.3 20.58 18.53v160.63c0 10.23-9.24 18.53-20.58 18.53-11.35 0-20.58-8.3-20.58-18.53V245.66z"/></svg>
+</file>
+
+<file path="front/html/src/lib/dialog.js">
+let dialogConfString = `
+<div style="width: 100%; height: 100%; position: absolute; display: flex; justify-content: center; align-items: center;">
+
+	<div id="dialogBox" style="width: min(300px, calc(100% - 40px)); box-sizing: border-box; padding: 10px; min-height: 50px; display: flex; flex-direction: column; align-items: center; gap: 10px">
+
+		<span id="dialogBoxText" style="text-align: center;"></span>
+
+		<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px">
+			<button id="dialogBoxYesButton" onclick="dialogConfirmYesClicked()" style="width: 100px" tabindex="0">Yes</button>
+			<button onclick="dialogConfirmNoClicked()" style="width: 100px" tabindex="0">No</button>
+		</div>
+
+	</div>
+
+</div>
+`
+
+let dialogAlertString = `
+<div style="width: 100%; height: 100%; position: absolute; display: flex; justify-content: center; align-items: center;">
+
+	<div id="dialogBox" style="width: min(300px, calc(100% - 40px)); box-sizing: border-box; padding: 10px; min-height: 50px; display: flex; flex-direction: column; align-items: center; gap: 10px">
+
+		<span id="dialogBoxText" style="text-align: center;"></span>
+
+		<div>
+			<button id="dialogBoxOkButton" onclick="dialogAlertOkClicked()" style="width: 100px" tabindex="0">OK</button>
+		</div>
+
+	</div>
+
+</div>
+`
+
+let callbackFunc;
+function dialogConfirmYesClicked(){
+	
+	callbackFunc(true)
+	document.getElementById("dialogRoot").remove();
+
+}
+
+function dialogConfirmNoClicked(){
+	
+	callbackFunc(false)
+	document.getElementById("dialogRoot").remove();
+
+}
+
+function dialogAlertOkClicked(){
+	
+	document.getElementById("dialogRoot").remove();
+
+}
+
+function conf(text, callback){
+	
+	callbackFunc = callback;
+	let div = document.createElement("div");
+	div.id = "dialogRoot";
+	div.style.width = "100%";
+	div.style.height = "100%";
+	div.style.position = "absolute";
+	div.style.top = "0";
+	div.style.left = "0";
+	div.innerHTML = dialogConfString;
+
+	document.getElementsByTagName("body")[0].appendChild(div);
+	document.getElementById("dialogBoxText").innerHTML = text;
+	document.getElementById("dialogBoxYesButton").focus();
+	
+
+}
+
+function alrt(text, callback){
+	
+	callbackFunc = callback;
+	let div = document.createElement("div");
+	div.id = "dialogRoot";
+	div.style.width = "100%";
+	div.style.height = "100%";
+	div.style.position = "absolute";
+	div.style.top = "0";
+	div.style.left = "0";
+	div.innerHTML = dialogAlertString;
+
+	document.getElementsByTagName("body")[0].appendChild(div);
+	document.getElementById("dialogBoxText").innerHTML = text;
+	document.getElementById("dialogBoxOkButton").focus();
+
+}
+
+function init(){
+
+	window.dialogConfirmNoClicked = dialogConfirmNoClicked;
+	window.dialogConfirmYesClicked = dialogConfirmYesClicked;
+	window.dialogAlertOkClicked = dialogAlertOkClicked;
+}
+
+export default {conf, alrt, init}
+</file>
+
+<file path="front/html/src/helper.js">
+const mod = {
+
+	fetchPost: (path, data, callback) => {
+
+		fetch(path, {
+
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(data)
+
+		})
+		.then(response => {
+
+			if (!response.ok) {
+				throw new Error('Network response != OK: ' + response.statusText);
+			}
+
+			return response.text();
+
+		})
+		.then(res => {
+
+			try {
+				callback(JSON.parse(res));
+			} catch (e) {
+				callback(res);
+			}
+
+		})
+		.catch(error => {
+			console.error(error);
+		});
+
+	},
+
+	copyToClipboard: (text) => {
+
+		if (navigator.clipboard && navigator.clipboard.writeText) {
+
+			navigator.clipboard.writeText(text)
+
+		} else {
+
+		  // sometimes clipboard api has problems on mobile browsers or won't work unless https connection, fallback
+		  // into this method instead
+		  const element = document.createElement('textarea')
+		  element.value = text
+		  document.body.appendChild(element)
+		  element.select()
+		  document.execCommand('copy')
+		  document.body.removeChild(element)
+
+		}
+  	}
+
+}
+
+export default mod;
+</file>
+
+<file path="front/html/src/index.js">
+import './style.css'
+import './layout.css'
+import App from './index.svelte'
+
+const app = new App({
+  target: document.getElementById('app'),
+})
+
+export default app
+</file>
+
+<file path="front/html/src/index.svelte">
+<script>
+
+	import { onMount } from 'svelte';
+	import f from './helper.js'
+	import dialog from './lib/dialog.js'
+	dialog.init();
+
+	let domainName = "";
+	let addresses = [];
+	let selectedAddress = null;
+
+	let mails = [];
+	let page = 1;
+	let viewType = "mails";
+
+	let mailDataSender;
+	let mailDataSubject;
+
+	function refreshMails(){
+
+		f.fetchPost('/mails', {addr: selectedAddress, page: page}, (data) => {
+
+			mails = data;
+
+		});
+
+	}
+
+	function selectedAddressChange(){
+		
+		page = 1;
+		refreshMails();
+		localStorage.setItem("address", selectedAddress);
+
+	}
+
+	function copyClicked(){
+		
+		f.copyToClipboard(selectedAddress + domainName);
+
+	}
+
+	function waitForElement(selector) {
+
+		return new Promise((resolve) => {
+			
+			const observer = new MutationObserver((mutationsList, observer) => {
+
+				for (let mutation of mutationsList) {
+					
+					if (mutation.type === 'childList' && document.querySelector(selector)) {
+
+						observer.disconnect();
+						resolve(document.querySelector(selector));
+						return;
+
+					}
+
+				}
+
+			});
+
+			observer.observe(document.body, { childList: true, subtree: true });
+
+		});
+
+	}
+
+	function mailClicked(event){
+
+		if((event.type == 'keypress' && event.key == 'Enter') || (event.type == 'click' && event.button == 0)){
+
+			let closest = event.target.closest(".clickable");
+			f.fetchPost('/mailData', {id: closest.dataset.id}, (data) => {
+
+				mailDataSender = data.sender;
+				mailDataSubject = data.subject;
+
+				viewType = 'mailData';
+
+				waitForElement("#mailData").then((element)=>{
+
+					const shadowRoot = element.attachShadow({ mode: 'open' });
+					shadowRoot.innerHTML = data.content;
+
+				})
+
+			});
+			
+		}
+
+	}
+
+	function deleteClicked(event){
+		
+		if((event.type == 'keydown' && event.key == 'Enter') || (event.type == 'click' && event.button == 0)){
+
+			dialog.conf("delete?", (res) => {
+				
+				if(res){
+
+					f.fetchPost('/deleteMail', {id: event.target.dataset.id}, () => {
+
+						refreshMails();
+				
+					});
+
+				}
+
+			})
+
+		}
+
+		event.stopPropagation();
+
+	}
+
+	function backClicked(){
+		
+		//cleanup
+		mailDataSender = null;
+		mailDataSubject = null;
+		viewType = "mails"
+
+	}
+
+	function nextPage(){
+
+		if(mails.length > 0){
+			page += 1;
+			refreshMails();
+		}
+	}
+
+	function prevPage(){
+		
+		if(page > 1){
+
+			page -= 1;
+			refreshMails();
+	
+		}
+
+	}
+
+	onMount(() => {
+
+		f.fetchPost('/addresses', {}, (data) => {
+
+			addresses = data.addresses;
+			if (data.addresses.length > 0){
+
+				selectedAddress = addresses[data.addresses.length-1].addr;
+				let lastSelectedAddress = localStorage.getItem("address");
+				if (lastSelectedAddress !== null && addresses.some(address => address.addr == lastSelectedAddress)) {
+
+					selectedAddress = lastSelectedAddress;
+
+				}
+
+				refreshMails();
+				setInterval(() => {
+					
+					refreshMails();
+				
+				}, data.refreshInterval*1000);
+
+			}
+
+		});
+
+		f.fetchPost('/domain', {}, (data) => {
+
+			domainName = '@' + data;
+
+		})
+
+	});
+
+</script>
+
+<main>
+	
+	<div class="adaptWidth flexCenterCol fillHeight gap">
+
+		<!--Put a div so that there will be a gap from the flex at the top of the page-->
+		<div></div>
+		
+		<div class="adaptWidthSmall" style="display: flex; align-items: center; flex-wrap: wrap">
+
+			<select bind:value={selectedAddress} on:change={selectedAddressChange} style="flex: 1">
+
+					{#each addresses as address}
+
+						<option value={address.addr}>{address.addr}</option>
+
+					{/each}
+
+			</select>
+
+			<span>{domainName}</span>
+
+			<button on:keypress={copyClicked} on:click={copyClicked} style="margin-left: 10px; padding-top: 0px; padding-bottom: 0px">Copy</button>
+
+		</div>
+
+		<div id="mailList" class="fillWidth">
+			
+			{#if viewType == 'mails'}
+
+				{#each mails as mail}
+
+					<div data-id={mail.id} on:keypress={mailClicked} on:click={mailClicked} role="button" tabindex="0" class="clickable" style="display: flex; align-items: center; justify-content: space-between">
+
+						<div> 
+
+							<span>{mail.sender}</span>
+							<div></div>
+							<span>{mail.subject}</span>
+
+						</div>
+
+						<input data-id={mail.id} on:keypress={deleteClicked} on:click={deleteClicked} type="image" src="trashIcon.svg" alt="X" style="width: 2rem; height: 2rem; padding: 1rem">
+
+					</div>
+					
+					<!--hr size inside flex is 0, gotta wrap with div, not sure why-->
+					<div>
+						<hr>
+					</div>
+
+				{/each}
+
+			{/if}
+
+			{#if viewType == 'mailData'}
+
+				<span>{mailDataSender}</span>
+				<div></div>
+				<span>{mailDataSubject}</span>
+
+				<!--hr size inside flex is 0, gotta wrap with div, not sure why-->
+				<div>
+					<hr>
+				</div>
+
+				<div id="mailData" style="all: initial; background-color: white; overflow: auto; flex: 1">
+				</div>
+
+				<div style="height: 10px;"></div>
+				<button on:click={backClicked}>Back</button>
+
+			{/if}
+
+		</div>
+
+		<div>
+			<button class="counter" on:click={prevPage}>❮</button>
+			<span>{page}</span>
+			<button class="counter" on:click={nextPage}>❯</button>
+		</div>
+
+		<button on:click={()=>{window.location.replace('/manage.html')}} class="adaptWidthSmall">Manage addresses</button>
+
+		<!--Put a div so that there will be a gap from the flex at the top of the page-->
+		<div></div>
+
+	</div>
+	
+</main>
+</file>
+
+<file path="front/html/src/layout.css">
+/* This file contains the layout structure
+ * for styling, open style.css
+ * */
+
+@font-face {
+    font-family: 'globalFont'; /* Name to use in CSS */
+    src: url('/roboto.ttf') format('truetype'); /* Path to the font file */
+	font-weight: 500;
+}
+
+html, body, #app {
+	
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+	font-family: globalFont;
+
+}
+
+main {
+
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	
+}
+
+
+.adaptWidth {
+	
+	width: min(800px, calc(100% - 40px));
+
+}
+
+.fillWidth {
+	
+	width: 100%;
+
+}
+
+.adaptWidthSmall {
+	
+	width: min(600px, 100%);
+
+}
+
+.fillHeight {
+	
+	height: 100%;
+
+}
+
+.flexCenterCol {
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+
+}
+
+.gap {
+	
+	gap: 10px;
+
+}
+
+.clickable {}
+.clickable:hover {
+	
+	cursor: pointer;
+
+}
+
+button, select, input, span {
+	
+	font-size: 1.25rem;
+	font-family: globalFont;
+	overflow-wrap: anywhere;
+
+}
+
+span {
+	
+	touch-action: manipulation; /* Prevent default touch behavior */
+	user-select: none;
+
+}
+
+#mailList {
+
+	flex: 1;
+	height: 100%;
+
+	box-sizing: border-box;
+	padding: 10px;
+
+	display: flex;
+	flex-direction: column;
+
+	overflow: auto;
+
+}
+
+#dialogBox {
+	
+	outline: 1px solid black;
+
+}
+
+@media (prefers-color-scheme: dark) {
+
+	#dialogBox {
+
+		outline: 1px solid white;
+
+	}
+
+}
+</file>
+
+<file path="front/html/src/manage.js">
+import './style.css'
+import './layout.css'
+import App from './manage.svelte'
+
+const app = new App({
+  target: document.getElementById('app'),
+})
+
+export default app
+</file>
+
+<file path="front/html/src/manage.svelte">
+<script>
+
+	import { onMount } from 'svelte';
+	import f from './helper.js'
+	import dialog from './lib/dialog.js'
+	dialog.init();
+
+	let hostName = '@' + window.location.host;
+	let addresses = [];
+
+	let selectedAddress = null;
+	let newAddressText = "";
+
+	function refreshAddress(){
+
+		f.fetchPost('/addresses', {}, (data) => {
+
+			addresses = data.addresses;
+			if (data.addresses.length > 0){
+			
+				selectedAddress = data.addresses[data.addresses.length-1].addr;
+
+			}
+
+		});
+
+	}
+
+	function addAddress(){
+
+		const regex = /^(?!\.)(?!.*\.\.)(?!.*\.$)[A-Za-z0-9!#$%&'*+/=?^_`{|}~.-]{1,64}$/;
+		if(regex.test(newAddressText)){
+
+			f.fetchPost('/addAddress', {address: newAddressText}, (data) => {
+
+				if(data == "exist"){
+					
+					dialog.alrt("address already exist");
+
+				}
+
+				if(data == "done"){
+				
+					newAddressText = "";
+					refreshAddress();
+
+				}
+
+			});
+
+		}else{
+
+			dialog.alrt("Invalid email address");
+
+		}
+
+	}
+
+	function deleteAddress(){
+
+		dialog.conf("Delete this address ?", (res) => {
+
+			if(res){
+
+				f.fetchPost('./deleteAddress', {address: selectedAddress}, (data) => {
+
+					if(data == "done"){
+
+						refreshAddress();
+
+					}	
+
+				});
+
+			}
+
+		})
+
+	}
+
+	function deleteEmails(){
+
+		dialog.conf("Delete all emails from this address ?", (res) => {
+
+			if(res){
+
+				f.fetchPost('./deleteEmails', {address: selectedAddress}, (data) => {
+
+					if(data == "done"){
+
+						dialog.alrt("Done")
+
+					}	
+
+				});
+
+			}
+
+		})
+
+	}
+
+	onMount(() => {
+
+		refreshAddress();
+
+	});
+
+
+</script>
+
+<main>
+
+	<div class="adaptWidth flexCenterCol fillHeight gap">
+
+		<div></div>
+
+		<!--New mails-->
+		<span>New address</span>
+		<div class="adaptWidthSmall" style="display: flex; flex-wrap: wrap">
+
+			<input bind:value={newAddressText} placeholder="New address" style="flex: 1">
+			<span>{hostName}</span>
+
+		</div>
+		<button on:click={addAddress} class="adaptWidthSmall">Add this address</button>
+		
+		<div style="height: 30px;"></div>
+
+		<!--List of existing addresses-->
+		<span>Manage addresses</span>
+		<div class="adaptWidthSmall" style="display: flex; flex-wrap: wrap">
+
+			<select bind:value={selectedAddress} style="flex: 1">
+
+				{#each addresses as address}
+
+					<option value={address.addr}>{address.addr}</option>
+
+				{/each}
+
+			</select>
+
+			<span>{hostName}</span>
+
+		</div>
+
+		<!--Delete selected address-->
+		<button disabled={addresses.length == 0} on:click={deleteAddress} class="adaptWidthSmall">Delete this address</button>
+		<button disabled={addresses.length == 0} on:click={deleteEmails} class="adaptWidthSmall">Delete all emails from this address</button>
+		<div style="flex: 1"></div>
+			<button on:click={()=>{window.location.replace('/')}} class="adaptWidthSmall" style="justify-content: flex-end">Back</button>
+		<div></div>
+
+	</div>
+
+</main>
+</file>
+
+<file path="front/html/src/style.css">
+button {
+	
+	border-radius: 7px;
+	outline: 1px solid black;
+	background: rgb(0,0,0,0);
+	color: rgb(0,0,0);
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border: none;
+
+}
+
+#dialogBox {
+
+	background-color: rgb(255,255,255);
+	border-radius: 7px;
+
+}
+
+input, select {
+
+	border-radius: 7px;
+	outline: 1px solid black;
+	border: none;
+
+}
+
+input[type="image"] {
+	
+	background-color: transparent;
+	outline: none;
+
+}
+
+button:hover {
+
+	cursor: pointer;
+
+}
+
+button:active {
+	
+	transform: scale(0.95);
+
+}
+
+select:hover {
+	
+	cursor: pointer;
+
+}
+
+.counter {
+
+	background-color: transparent;
+	color: rgb(12,12,12);
+	outline: none
+
+}
+
+#mailList {
+
+	border-radius: 7px;
+	outline: 2px solid rgb(200, 200, 200);
+
+}
+
+@media (prefers-color-scheme: dark) {
+
+	body {
+
+		background-color: rgb(15,15,15);
+		color: rgb(255,255,255);
+
+	}
+
+	button {
+
+		color: rgb(255, 255, 255);
+		outline: 1px solid white;
+
+	}
+
+	input, select {
+
+		border-radius: 7px;
+		outline: 1px solid white;
+		background-color: rgb(15,15,15);
+		color: white;
+		border: none;
+
+	}
+
+	.counter {
+		
+		color: rgb(255, 255, 255);
+
+	}
+
+	#dialogBox {
+
+		background-color: rgb(15,15,15);
+
+	}
+
+	#mailList {
+
+		outline: 2px solid rgb(55, 55, 55);
+
+	}
+
+}
+</file>
+
+<file path="front/html/src/vite-env.d.ts">
+/// <reference types="svelte" />
+/// <reference types="vite/client" />
+</file>
+
+<file path="front/html/index.html">
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta name="HandheldFriendly" content="true" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/index.js"></script>
+  </body>
+</html>
+</file>
+
+<file path="front/html/manage.html">
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/manage.js"></script>
+  </body>
+</html>
+</file>
+
+<file path="front/.gitignore">
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+</file>
+
+<file path="front/jsconfig.json">
+{
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "target": "ESNext",
+    "module": "ESNext",
+    /**
+     * svelte-preprocess cannot figure out whether you have
+     * a value or a type, so tell TypeScript to enforce using
+     * `import type` instead of `import` for Types.
+     */
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    /**
+     * To have warnings / errors of the Svelte compiler at the
+     * correct position, enable source maps by default.
+     */
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    /**
+     * Typecheck JS in `.svelte` and `.js` files by default.
+     * Disable this if you'd like to use dynamic types.
+     */
+    "checkJs": true
+  },
+  /**
+   * Use global.d.ts instead of compilerOptions.types
+   * to avoid limiting type declarations.
+   */
+  "include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.svelte"]
+}
+</file>
+
+<file path="front/package.json">
+{
+  "name": "svelte",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^3.1.1",
+    "svelte": "^4.2.18",
+    "vite": "^5.4.1"
+  }
+}
+</file>
+
+<file path="front/README.md">
+# Svelte + Vite
+
+This template should help get you started developing with Svelte in Vite.
+
+## Recommended IDE Setup
+
+[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+
+## Need an official Svelte framework?
+
+Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+
+## Technical considerations
+
+**Why use this over SvelteKit?**
+
+- It brings its own routing solution which might not be preferable for some users.
+- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+
+This template contains as little as possible to get started with Vite + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+
+Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+
+**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+
+Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
+
+**Why include `.vscode/extensions.json`?**
+
+Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
+
+**Why enable `checkJs` in the JS template?**
+
+It is likely that most cases of changing variable types in runtime are likely to be accidental, rather than deliberate. This provides advanced typechecking out of the box. Should you like to take advantage of the dynamically-typed nature of JavaScript, it is trivial to change the configuration.
+
+**Why is HMR not preserving my local component state?**
+
+HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/sveltejs/svelte-hmr/tree/master/packages/svelte-hmr#preservation-of-local-state).
+
+If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
+
+```js
+// store.js
+// An extremely simple external store
+import { writable } from 'svelte/store'
+export default writable(0)
+```
+</file>
+
+<file path="front/svelte.config.js">
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
+
+export default {
+  // Consult https://svelte.dev/docs#compile-time-svelte-preprocess
+  // for more information about preprocessors
+  preprocess: vitePreprocess(),
+}
+</file>
+
+<file path="front/vite.config.js">
+import { defineConfig } from 'vite'
+import { svelte } from '@sveltejs/vite-plugin-svelte'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+
+	root: './html',
+	server: {
+		watch: {
+			usePolling: true,
+			interval: 250,
+		}
+	},
+	plugins: [svelte()],
+	build: {
+
+		rollupOptions: {
+			
+			input: {
+				
+				main: './html/index.html',
+				manage: './html/manage.html',
+
+			},
+
+		},
+
+		outDir: './dist',
+		emptyOutDir: true,
+
+	}
+
+})
+</file>
+
+<file path=".gitignore">
+node_modules
+*.key
+*.crt
+*.db
+dist
+</file>
+
+<file path="config.js">
+"use strict";
+import fs from 'fs'
+
+let mod = {
+
+	configs: {},
+
+	getConfig: function(key){
+
+		return this.configs[key];
+
+	},
+
+	init: function(){
+
+		try {
+
+            const data = fs.readFileSync('./data/config.json', 'utf8');
+            this.configs = JSON.parse(data);
+
+        } catch (err) {
+
+            console.log('Error reading data.json');
+            console.log(err);
+            process.exit();
+
+        }
+
+	}
+
+}
+
+export default mod;
+</file>
+
+<file path="database.js">
+"use strict";
+import sqlite3 from 'better-sqlite3';
+
+let database = {
+
+	init: function(){
+
+		try {
+
+			const db = new sqlite3('./data/data.db');
+			db.exec("CREATE TABLE IF NOT EXISTS address (addr TEXT NOT NULL)");
+			let res = db.prepare("SELECT COUNT(*) as count FROM address").get();
+
+			if (res.count == 0){
+
+				//generate random username
+				const letters = 'abcdefghijklmnopqrstuvwxyz';
+				let uname = '';
+				for (let i = 0; i < 3; i++) {
+					const randomIndex = Math.floor(Math.random() * letters.length);
+					uname += letters[randomIndex];
+				}
+				uname += Math.floor(Math.random() * 10).toString();
+				uname += Math.floor(Math.random() * 10).toString();
+
+				db.prepare("INSERT INTO address (addr) VALUES (?)").run(uname);
+
+			}
+
+			db.exec("CREATE TABLE IF NOT EXISTS mail (id TEXT NOT NULL, recipient TEXT NOT NULL, sender TEXT NOT NULL, subject TEXT NOT NULL, content TEXT NOT NULL)");
+
+			return db;
+
+		} catch(err) {
+
+			console.log("DB init fail")
+			console.log(err);
+			process.exit();
+
+		}
+
+	}
+
+}
+
+export default database;
+</file>
+
+<file path="docker-compose.yaml">
+services:
+  mail:
+    build: .
+    ports:
+      - "25:25"
+      - "80:80"
+    volumes:
+      - ./data:/app/data
+</file>
+
+<file path="Dockerfile">
+FROM alpine:latest
+
+RUN apk add --no-cache git nodejs npm
+
+WORKDIR /app
+
+COPY . /app
+
+RUN npm install --production
+
+WORKDIR front
+
+RUN npm install
+RUN npm run build
+
+WORKDIR /app
+
+CMD ["node", "main.js"]
+</file>
+
+<file path="domain.js">
+"use strict";
+import fs from 'fs'
+import path from 'path'
+import crypto from 'crypto'
+
+let mod = {
+
+	getDomainName: function(){
+
+		let cert = "";
+
+		try {
+
+			const files = fs.readdirSync("./data");
+			for(let fileName of files){
+
+				let ext = path.extname(fileName);
+				if(ext != ".db" && ext != ".json"){
+
+					let content = fs.readFileSync("./data/" + fileName, 'utf8');
+
+					if(content.includes("BEGIN CERTIFICATE")){
+						cert = content;
+					}
+
+				}
+
+			}
+
+		} catch (err) {
+
+			console.log("read directory fail");
+			console.log(err);
+
+		}
+
+		if(cert){
+
+			let extract = new crypto.X509Certificate(cert).subject;
+			let res = extract.match(/CN=([^ ]+)/);
+			return res[1] || "";
+		
+		}else{
+
+			return "";
+
+		}
+
+	}
+
+}
+
+export default mod;
+</file>
+
+<file path="helper.js">
+"use strict";
+const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+let helper = {
+
+	randomID: function(){
+			
+		let resultStr = "";
+		for (let i=0; i<10; i++){
+				
+			resultStr += chars[Math.floor(Math.random() * chars.length)]; 
+
+		}
+
+		return new Date().getTime() + resultStr;
+
+	}
+
+}
+
+export default helper;
+</file>
+
+<file path="httpSrv.js">
+"use strict";
+import express from 'express'
+import compression from 'compression'
+import config from './config.js'
+
+let mod = {
+
+	start: function(db, domainName, port){
+
+		const app = express();
+
+		app.use(express.json());
+		app.use(compression());
+		app.use(express.static('./front/html/dist'));
+
+		let refreshInterval = config.getConfig("MailRefreshInterval");
+		app.post('/addresses', (_req, res) => {
+
+			try {
+
+				let rows = db.prepare("SELECT addr FROM address").all();
+				res.json({addresses: rows, refreshInterval: refreshInterval});
+
+			} catch(err) {
+
+				console.log("DB get addresses fail")
+				console.log(err)
+
+			}
+
+		})
+
+		app.post('/domain', (req, res) => {
+
+			if (domainName){
+
+				return res.status(200).send(domainName);
+
+			}else{
+
+				return res.status(200).send(req.headers.host.split(':')[0]);
+
+			}
+
+		})
+
+		app.post('/addAddress', (req, res) => {
+		
+			const json = req.body;
+			
+			try {
+
+				let rows = db.prepare("SELECT addr FROM address WHERE addr = ?").all(json.address);
+				if(rows.length > 0){
+					
+					return res.status(200).send("exist");
+
+				}
+
+				db.prepare("INSERT INTO address (addr) VALUES (?)").run(json.address);
+				return res.status(200).send("done");
+
+			} catch(err) {
+
+				console.log("DB add addresses fail")
+				console.log(err)
+
+			}
+
+		})
+
+		app.post('/deleteAddress', (req, res) => {
+
+			const json = req.body;
+
+			try {
+
+				db.prepare("DELETE FROM address WHERE addr = ?").run(json.address);
+				db.prepare("DELETE FROM mail WHERE recipient = ?").run(json.address);
+
+				return res.status(200).send("done");
+
+			} catch(err) {
+
+				console.log("DB delete address fail")
+				console.log(err)
+
+			}
+
+		})
+
+		app.post('/deleteEmails', (req, res) => {
+
+			const json = req.body;
+
+			try {
+
+				db.prepare("DELETE FROM mail WHERE recipient = ?").run(json.address);
+				return res.status(200).send("done");
+
+			} catch(err) {
+
+				console.log("DB delete address fail")
+				console.log(err)
+
+			}
+
+		})
+
+
+
+		app.post('/mails', (req, res) => {
+
+			const json = req.body;
+
+			try {
+
+				let rows = db.prepare("SELECT id, sender, subject FROM mail WHERE recipient = @recipient ORDER BY id DESC LIMIT @mailCount OFFSET (@page-1)*@mailCount").all({recipient: json.addr, page: json.page, mailCount: config.getConfig('MailCountPerPage')});
+				res.json(rows);
+
+			} catch(err) {
+
+				console.log("DB get mails fail")
+				console.log(err)
+
+			}
+
+		});
+
+		app.post('/mailData', (req, res) => {
+
+			const json = req.body;
+
+			try {
+
+				let rows = db.prepare("SELECT sender, subject, content FROM mail WHERE id = ?").all(json.id);
+				res.json(rows[0])
+
+			} catch(err) {
+
+				console.log("DB get mail data fail")
+				console.log(err)
+
+			}
+
+		});
+
+		app.post('/deleteMail', (req, res) => {
+
+			const json = req.body;
+
+			try {
+
+				db.prepare("DELETE FROM mail WHERE id = ?").run(json.id);
+				res.status(200).send();
+
+			} catch(err) {
+
+				console.log("DB delete mail fail")
+				console.log(err)
+
+			}
+
+		})
+
+		app.use((err, req, res, next) => {
+			console.error(err)
+		});
+
+		app.listen(port, () => {
+			console.log('http server listening at port: ' + port);	
+		})
+		
+	}
+
+}
+
+
+export default mod;
+</file>
+
+<file path="LICENSE">
+# PolyForm Noncommercial License 1.0.0
+
+<https://polyformproject.org/licenses/noncommercial/1.0.0>
+
+## Acceptance
+
+In order to get any license under these terms, you must agree
+to them as both strict obligations and conditions to all
+your licenses.
+
+## Copyright License
+
+The licensor grants you a copyright license for the
+software to do everything you might do with the software
+that would otherwise infringe the licensor's copyright
+in it for any permitted purpose.  However, you may
+only distribute the software according to [Distribution
+License](#distribution-license) and make changes or new works
+based on the software according to [Changes and New Works
+License](#changes-and-new-works-license).
+
+## Distribution License
+
+The licensor grants you an additional copyright license
+to distribute copies of the software.  Your license
+to distribute covers distributing the software with
+changes and new works permitted by [Changes and New Works
+License](#changes-and-new-works-license).
+
+## Notices
+
+You must ensure that anyone who gets a copy of any part of
+the software from you also gets a copy of these terms or the
+URL for them above, as well as copies of any plain-text lines
+beginning with `Required Notice:` that the licensor provided
+with the software.  For example:
+
+> Required Notice: Copyright Yoyodyne, Inc. (http://example.com)
+
+## Changes and New Works License
+
+The licensor grants you an additional copyright license to
+make changes and new works based on the software for any
+permitted purpose.
+
+## Patent License
+
+The licensor grants you a patent license for the software that
+covers patent claims the licensor can license, or becomes able
+to license, that you would infringe by using the software.
+
+## Noncommercial Purposes
+
+Any noncommercial purpose is a permitted purpose.
+
+## Personal Uses
+
+Personal use for research, experiment, and testing for
+the benefit of public knowledge, personal study, private
+entertainment, hobby projects, amateur pursuits, or religious
+observance, without any anticipated commercial application,
+is use for a permitted purpose.
+
+## Noncommercial Organizations
+
+Use by any charitable organization, educational institution,
+public research organization, public safety or health
+organization, environmental protection organization,
+or government institution is use for a permitted purpose
+regardless of the source of funding or obligations resulting
+from the funding.
+
+## Fair Use
+
+You may have "fair use" rights for the software under the
+law. These terms do not limit them.
+
+## No Other Rights
+
+These terms do not allow you to sublicense or transfer any of
+your licenses to anyone else, or prevent the licensor from
+granting licenses to anyone else.  These terms do not imply
+any other licenses.
+
+## Patent Defense
+
+If you make any written claim that the software infringes or
+contributes to infringement of any patent, your patent license
+for the software granted under these terms ends immediately. If
+your company makes such a claim, your patent license ends
+immediately for work on behalf of your company.
+
+## Violations
+
+The first time you are notified in writing that you have
+violated any of these terms, or done anything with the software
+not covered by your licenses, your licenses can nonetheless
+continue if you come into full compliance with these terms,
+and take practical steps to correct past violations, within
+32 days of receiving notice.  Otherwise, all your licenses
+end immediately.
+
+## No Liability
+
+***As far as the law allows, the software comes as is, without
+any warranty or condition, and the licensor will not be liable
+to you for any damages arising out of these terms or the use
+or nature of the software, under any kind of legal claim.***
+
+## Definitions
+
+The **licensor** is the individual or entity offering these
+terms, and the **software** is the software the licensor makes
+available under these terms.
+
+**You** refers to the individual or entity agreeing to these
+terms.
+
+**Your company** is any legal entity, sole proprietorship,
+or other kind of organization that you work for, plus all
+organizations that have control over, are under the control of,
+or are under common control with that organization.  **Control**
+means ownership of substantially all the assets of an entity,
+or the power to direct its management and policies by vote,
+contract, or otherwise.  Control can be direct or indirect.
+
+**Your licenses** are all the licenses granted to you for the
+software under these terms.
+
+**Use** means anything you do with the software requiring one
+of your licenses.
+</file>
+
+<file path="main.js">
+"use strict";
+import smtpSrv from './smtpSrv.js'
+import httpSrv from './httpSrv.js'
+import config from './config.js'
+import domain from './domain.js'
+import database from './database.js'
+
+config.init();
+let db = database.init();
+let domainName = domain.getDomainName();
+
+smtpSrv.start(db, 25);
+httpSrv.start(db, domainName, 80);
+</file>
+
+<file path="package.json">
+{
+  "name": "mail",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "dev": "concurrently --kill-others \"nodemon main.js\" \"npm --prefix ./front run dev\""
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "compression": "^1.8.0",
+    "express": "^4.21.0",
+    "mailparser": "^3.7.1",
+    "smtp-server": "^3.13.5"
+  },
+  "type": "module",
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "nodemon": "^3.1.7"
+  }
+}
+</file>
+
+<file path="README.md">
+# Nortix Mail
+Please star this repo if you find it useful, thank you!
+![image](https://github.com/user-attachments/assets/625d9d45-75e9-43f5-8264-57d2ed7ee7d8)
+
+# Purpose 🎯
+Whenever you sign up with your email on a website, your email address is stored and sometimes sold to advertisers. This is where you get your bulk of spam emails. Whenever a data breach happens, you also risk having your primary email address leaked and informations stolen.
+
+Using Nortix Mail, you can create disposable email addresses that can be used to sign up to website that requires email verification. This is very useful when you just want to try out new website / services without giving away your real email address. It significantly enhances privacy, security and reduces spam. It's like running your own Gmail server.
+
+# Why it's better than other similar services ⚡
+Email servers are notoriously difficult to set up, Nortix Mail aims to make it as simple as possible by making TLS optional and it can automatically detect your domain if you choose to use TLS. If you change your domain, it can automatically detect it and requires no additional configuration. If you want to move the data to another server, just copy the `data` folder.
+
+# Run without docker 🖥️
+1. make sure that nodejs & npm is installed
+2. run `npm install`
+4. run `cd front`
+5. run `npm install`
+6. run `npm run build`
+7. run `cd ..`
+8. run `node main.js`
+
+or use the combined command: `npm install && cd front && npm install && npm run build && cd .. && node main.js`  
+The http server will be listening on port 80. Make sure that your port 25 is accessible to receive mails
+
+# Run with docker 🐋
+1. git clone / download this repo
+2. run `docker compose up -d`
+
+In the `docker-compose.yaml` file, port `25:25` is mapped by default. It is recommended to not change this setting if you are using a reverse proxy as some of them cannot forward smtp packets
+
+# Configurations
+You can edit `config.json` inside `data/config.json` to change the mail refresh interval and number of emails shown per page
+
+# Adding TLS / Encryption (optional) 🔒
+copy your certificate and private key files into the `data` folder (usually, the file extensions are `.crt` and `.key`). The file name and extension don't actually matter as Nortix Mail can automatically detect which one is which
+
+# Is it safe if I don't use TLS? 🔍
+The current mail transfer protocol is very old and by default it doesn't require TLS to function. This means that when another server sends an email to your server, anyone in between can theoretically read the mail if they actively try to intercept. However, this is unlikely to happen as the people who have this capability are mostly ISPs and hosting providers. For better security, setting up TLS is still recommended.
+
+# Contributing 🤝
+This repository currently doesn't accept any pull request. However, you can open an issue if you want to request a feature, report bugs or ask me a question.
+</file>
+
+<file path="smtpSrv.js">
+"use strict";
+import { SMTPServer as ssrv } from 'smtp-server'
+import { simpleParser } from 'mailparser'
+import fs from 'fs'
+import path from 'path'
+import h from './helper.js'
+
+let mod = {
+
+	start: function(db , port){
+
+		let opt = {
+
+			async onData(stream, _session, callback) {
+
+				try {
+
+					const mail = await simpleParser(stream);
+
+					let sender = mail.from.value[0].address || mail.from.value[0].name;
+					let subject = mail.subject;
+					let content;
+
+					if(mail.html){
+						content = mail.html;
+					}else{
+						content = mail.textAsHtml;
+					}
+
+					try {
+
+						for (let recipient of mail.to.value){
+
+							var recipientName = recipient.address.substring(0, recipient.address.lastIndexOf("@"));
+							let res = db.prepare("SELECT COUNT(*) as count FROM address WHERE addr = ?").all(recipientName);
+
+							if (res[0].count > 0) {
+
+								let id = h.randomID();
+								db.prepare("INSERT INTO mail (id, recipient, sender, subject, content) VALUES (?, ?, ?, ?, ?)").run(id, recipientName, sender, subject, content);
+								break;
+
+							}
+
+						}
+
+					} catch (err) {
+
+						console.log("Inbound email error");
+						console.log(err);
+					
+					}
+
+				} catch (err) {
+
+					console.log("Processing email error");
+					console.log(err);
+
+				}
+
+				callback(null);
+
+			},
+
+			authOptional: true,
+
+			onConnect(_session, callback) {
+
+				return callback();	
+
+			},
+
+		}
+
+		try {
+
+			//automatically detect public / private key
+			const files = fs.readdirSync("./data");
+			for(let fileName of files){
+
+				let ext = path.extname(fileName);
+				if(ext != ".db" && ext != ".json"){
+
+					let content = fs.readFileSync("./data/" + fileName, 'utf8');
+					if(content.includes("PRIVATE KEY")){
+						opt.key = content;
+					}
+
+					if(content.includes("BEGIN CERTIFICATE")){
+						opt.cert = content;
+					}
+
+				}
+
+			}
+
+		} catch (err) {
+
+			console.log("read directory fail");
+			console.log(err);
+
+		}
+			
+		const server = new ssrv(opt);
+		server.on('error', (err) => {
+
+			console.log("SMTP server error");
+			console.log(err);
+
+		});
+
+		server.listen(port, () => {
+
+			console.log('smtp server running at port: ' + port);
+
+		});
+
+	}
+
+}
+
+export default mod;
+</file>
+
+</files>

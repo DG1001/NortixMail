@@ -29,6 +29,23 @@ let database = {
 
 			db.exec("CREATE TABLE IF NOT EXISTS mail (id TEXT NOT NULL, recipient TEXT NOT NULL, sender TEXT NOT NULL, subject TEXT NOT NULL, content TEXT NOT NULL)");
 
+			db.exec(`CREATE TABLE IF NOT EXISTS sent_mails (
+				id TEXT PRIMARY KEY,
+				from_addr TEXT NOT NULL,
+				to_addr TEXT NOT NULL,
+				subject TEXT NOT NULL,
+				content TEXT NOT NULL,
+				sent_at DATETIME DEFAULT CURRENT_TIMESTAMP
+			)`);
+
+			db.exec(`CREATE TABLE IF NOT EXISTS forwarding_rules (
+				id TEXT PRIMARY KEY,
+				source_addr TEXT NOT NULL,
+				target_addr TEXT NOT NULL,
+				auto_forward BOOLEAN DEFAULT 0,
+				created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+			)`);
+
 			return db;
 
 		} catch(err) {
