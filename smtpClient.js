@@ -47,7 +47,7 @@ let mod = {
 				console.log("TLS cert detection failed, using non-secure connection");
 			}
 
-			this.transporter = nodemailer.createTransporter(transporterOptions);
+			this.transporter = nodemailer.createTransport(transporterOptions);
 
 		} catch (err) {
 			console.log("SMTP client init failed");
