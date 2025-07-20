@@ -24,10 +24,13 @@ let mod = {
 			let transporterOptions = {
 				host: smtpConfig.host,
 				port: smtpConfig.port,
-				secure: smtpConfig.secure,
-				ignoreTLS: !smtpConfig.secure,
-				requireTLS: false
+				secure: smtpConfig.secure
 			};
+
+			// For Gmail and most SMTP providers on port 587, enable STARTTLS
+			if (!smtpConfig.secure && smtpConfig.port === 587) {
+				transporterOptions.requireTLS = true;
+			}
 
 			if (smtpConfig.auth) {
 				transporterOptions.auth = smtpConfig.auth;
