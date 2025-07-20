@@ -29,6 +29,10 @@ let mod = {
 				requireTLS: false
 			};
 
+			if (smtpConfig.auth) {
+				transporterOptions.auth = smtpConfig.auth;
+			}
+
 			try {
 				const files = fs.readdirSync("./data");
 				for(let fileName of files){
