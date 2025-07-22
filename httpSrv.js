@@ -299,6 +299,44 @@ let mod = {
 
 		})
 
+		app.post('/addressOverview', (req, res) => {
+
+			try {
+
+				let overview = [];
+				let addresses = db.prepare("SELECT addr FROM address").all();
+
+				for (let address of addresses) {
+					let mailCount = db.prepare("SELECT COUNT(*) as count FROM mail WHERE recipient = ?").get(address.addr);
+					let latestMail = db.prepare("SELECT sender, subject, id FROM mail WHERE recipient = ? ORDER BY id DESC LIMIT 1").get(address.addr);
+					let forwardingRules = db.prepare("SELECT COUNT(*) as total, COUNT(CASE WHEN auto_forward = 1 THEN 1 END) as auto FROM forwarding_rules WHERE source_addr = ?").get(address.addr);
+
+					let forwardingStatus = "none";
+					if (forwardingRules.total > 0) {
+						forwardingStatus = forwardingRules.auto > 0 ? "auto" : "manual";
+					}
+
+					overview.push({
+						address: address.addr,
+						mailCount: mailCount.count,
+						latestMail: latestMail || null,
+						forwardingStatus: forwardingStatus,
+						forwardingCount: forwardingRules.total
+					});
+				}
+
+				res.json(overview);
+
+			} catch(err) {
+
+				console.log("DB get address overview fail");
+				console.log(err);
+				res.status(500).json({ error: err.message });
+
+			}
+
+		})
+
 		app.use((err, req, res, next) => {
 			console.error(err)
 		});

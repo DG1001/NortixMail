@@ -13,8 +13,9 @@
 	let mails = [];
 	let sentMails = [];
 	let page = 1;
-	let viewType = "mails"; // "mails", "sent", "mailData"
+	let viewType = "overview"; // "mails", "sent", "mailData", "overview"
 	let showCompose = false;
+	let addressOverview = [];
 
 	let mailDataSender;
 	let mailDataSubject;
@@ -43,6 +44,17 @@
 		viewType = "mails";
 		page = 1;
 		refreshMails();
+	}
+
+	function showOverview(){
+		viewType = "overview";
+		refreshOverview();
+	}
+
+	function refreshOverview(){
+		f.fetchPost('/addressOverview', {}, (data) => {
+			addressOverview = data;
+		});
 	}
 
 	function openCompose(){
@@ -204,9 +216,14 @@
 				}
 
 				refreshMails();
+				refreshOverview();
 				setInterval(() => {
 					
-					refreshMails();
+					if (viewType === "overview") {
+						refreshOverview();
+					} else {
+						refreshMails();
+					}
 				
 				}, data.refreshInterval*1000);
 
@@ -251,11 +268,66 @@
 		</div>
 
 		<div class="adaptWidthSmall" style="display: flex; gap: 10px; margin-bottom: 10px;">
+			<button on:click={showOverview} class:active={viewType === "overview"} class="tab-btn">Overview</button>
 			<button on:click={showInboxEmails} class:active={viewType === "mails"} class="tab-btn">Inbox</button>
 			<button on:click={showSentEmails} class:active={viewType === "sent"} class="tab-btn">Sent</button>
 		</div>
 
 		<div id="mailList" class="fillWidth">
+			
+			{#if viewType == 'overview'}
+
+				<div class="overview-table">
+					<table>
+						<thead>
+							<tr>
+								<th>Address</th>
+								<th>Mails</th>
+								<th>Latest Subject</th>
+								<th>Forwarding</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each addressOverview as item}
+								<tr>
+									<td class="address-cell">
+										<strong>{item.address}</strong>{domainName}
+									</td>
+									<td class="count-cell">
+										{item.mailCount}
+									</td>
+									<td class="subject-cell">
+										{#if item.latestMail}
+											<div class="latest-mail">
+												<div class="subject">{item.latestMail.subject}</div>
+												<div class="sender">from {item.latestMail.sender}</div>
+											</div>
+										{:else}
+											<em>No emails</em>
+										{/if}
+									</td>
+									<td class="forwarding-cell">
+										<span class="forwarding-badge forwarding-{item.forwardingStatus}">
+											{#if item.forwardingStatus === 'auto'}
+												🔄 Auto ({item.forwardingCount})
+											{:else if item.forwardingStatus === 'manual'}
+												↩️ Manual ({item.forwardingCount})
+											{:else}
+												➖ None
+											{/if}
+										</span>
+									</td>
+									<td class="actions-cell">
+										<button on:click={() => {selectedAddress = item.address; showInboxEmails();}} class="view-btn">View</button>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+
+			{/if}
 			
 			{#if viewType == 'mails'}
 
@@ -372,6 +444,88 @@
 		border-color: #007bff;
 	}
 
+	.overview-table {
+		overflow-x: auto;
+		margin: 10px;
+	}
+
+	.overview-table table {
+		width: 100%;
+		border-collapse: collapse;
+		background-color: white;
+		border-radius: 7px;
+		overflow: hidden;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+	}
+
+	.overview-table th,
+	.overview-table td {
+		padding: 12px;
+		text-align: left;
+		border-bottom: 1px solid #e0e0e0;
+	}
+
+	.overview-table th {
+		background-color: #f8f9fa;
+		font-weight: bold;
+		color: #495057;
+	}
+
+	.address-cell strong {
+		color: #007bff;
+	}
+
+	.count-cell {
+		font-weight: bold;
+		color: #28a745;
+	}
+
+	.latest-mail .subject {
+		font-weight: 500;
+		margin-bottom: 2px;
+	}
+
+	.latest-mail .sender {
+		font-size: 0.85rem;
+		color: #6c757d;
+	}
+
+	.forwarding-badge {
+		padding: 4px 8px;
+		border-radius: 12px;
+		font-size: 0.8rem;
+		font-weight: bold;
+	}
+
+	.forwarding-auto {
+		background-color: #d4edda;
+		color: #155724;
+	}
+
+	.forwarding-manual {
+		background-color: #d1ecf1;
+		color: #0c5460;
+	}
+
+	.forwarding-none {
+		background-color: #f8d7da;
+		color: #721c24;
+	}
+
+	.view-btn {
+		padding: 6px 12px;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		font-size: 0.8rem;
+		cursor: pointer;
+	}
+
+	.view-btn:hover {
+		background-color: #0056b3;
+	}
+
 	@media (prefers-color-scheme: dark) {
 		.tab-btn {
 			background-color: #333;
@@ -382,6 +536,38 @@
 		.tab-btn.active {
 			background-color: #007bff;
 			border-color: #007bff;
+		}
+
+		.overview-table table {
+			background-color: #333;
+		}
+
+		.overview-table th {
+			background-color: #444;
+			color: #fff;
+		}
+
+		.overview-table td {
+			border-bottom-color: #555;
+		}
+
+		.latest-mail .sender {
+			color: #aaa;
+		}
+
+		.forwarding-auto {
+			background-color: #0f3f0f;
+			color: #90ee90;
+		}
+
+		.forwarding-manual {
+			background-color: #0f2f3f;
+			color: #87ceeb;
+		}
+
+		.forwarding-none {
+			background-color: #3f0f0f;
+			color: #ffb3b3;
 		}
 	}
 </style>
