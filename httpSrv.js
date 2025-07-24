@@ -299,6 +299,25 @@ let mod = {
 
 		})
 
+		app.post('/clearInbox', (req, res) => {
+
+			const json = req.body;
+
+			try {
+
+				db.prepare("DELETE FROM mail WHERE recipient = ?").run(json.address);
+				return res.status(200).send("done");
+
+			} catch(err) {
+
+				console.log("DB clear inbox fail");
+				console.log(err);
+				res.status(500).json({ error: err.message });
+
+			}
+
+		})
+
 		app.post('/addressOverview', (req, res) => {
 
 			try {

@@ -82,6 +82,22 @@
 		}
 	}
 
+	function clearInbox(){
+		dialog.conf("Alle E-Mails in der Inbox löschen?", (res) => {
+			if(res){
+				f.fetchPost('/clearInbox', {address: selectedAddress}, (response) => {
+					if (response === "done") {
+						dialog.alrt("Inbox erfolgreich geleert!");
+						refreshMails();
+						refreshOverview();
+					} else {
+						dialog.alrt("Fehler beim Leeren der Inbox: " + (response.error || "Unbekannter Fehler"));
+					}
+				});
+			}
+		});
+	}
+
 	function selectedAddressChange(){
 		
 		page = 1;
@@ -271,6 +287,9 @@
 			<button on:click={showOverview} class:active={viewType === "overview"} class="tab-btn">Overview</button>
 			<button on:click={showInboxEmails} class:active={viewType === "mails"} class="tab-btn">Inbox</button>
 			<button on:click={showSentEmails} class:active={viewType === "sent"} class="tab-btn">Sent</button>
+			{#if viewType === "mails"}
+				<button on:click={clearInbox} class="clear-inbox-btn">Inbox leeren</button>
+			{/if}
 		</div>
 
 		<div id="mailList" class="fillWidth">
@@ -444,6 +463,21 @@
 		border-color: #007bff;
 	}
 
+	.clear-inbox-btn {
+		padding: 8px 16px;
+		border: 1px solid #dc3545;
+		background-color: #dc3545;
+		color: white;
+		cursor: pointer;
+		border-radius: 4px;
+		margin-left: auto;
+	}
+
+	.clear-inbox-btn:hover {
+		background-color: #c82333;
+		border-color: #c82333;
+	}
+
 	.overview-table {
 		overflow-x: auto;
 		margin: 10px;
@@ -536,6 +570,16 @@
 		.tab-btn.active {
 			background-color: #007bff;
 			border-color: #007bff;
+		}
+
+		.clear-inbox-btn {
+			background-color: #dc3545;
+			border-color: #dc3545;
+		}
+
+		.clear-inbox-btn:hover {
+			background-color: #c82333;
+			border-color: #c82333;
 		}
 
 		.overview-table table {
