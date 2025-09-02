@@ -19,6 +19,7 @@
 
 	let mailDataSender;
 	let mailDataSubject;
+	let mailDataRecipients = [];
 
 	function refreshMails(){
 
@@ -147,6 +148,10 @@
 
 				mailDataSender = data.sender;
 				mailDataSubject = data.subject;
+				mailDataRecipients = [];
+				if (data.rcpt_list) {
+					mailDataRecipients = Array.from(new Set(data.rcpt_list.split(',').map(s => s.trim()).filter(Boolean)));
+				}
 
 				viewType = 'mailData';
 
@@ -192,6 +197,7 @@
 		//cleanup
 		mailDataSender = null;
 		mailDataSubject = null;
+		mailDataRecipients = [];
 		viewType = "mails"
 
 	}
@@ -410,6 +416,11 @@
 				<span>{mailDataSender}</span>
 				<div></div>
 				<span>{mailDataSubject}</span>
+				{#if mailDataRecipients && mailDataRecipients.length > 1}
+					<div style="font-size: 0.9rem; color: #555; margin-top: 6px;">
+						<strong>Original recipients:</strong> {mailDataRecipients.join(', ')}
+					</div>
+				{/if}
 
 				<!--hr size inside flex is 0, gotta wrap with div, not sure why-->
 				<div>

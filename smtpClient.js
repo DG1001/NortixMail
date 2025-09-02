@@ -101,24 +101,41 @@ let mod = {
 
 		try {
 
-			let fromAddress = sourceAddr + '@' + (domainName || 'localhost');
-			let forwardSubject = `Fwd: ${originalMail.subject}`;
-			let forwardContent = `
-				<div style="border-left: 2px solid #ccc; padding-left: 10px; margin: 10px 0;">
-					<p><strong>Forwarded message:</strong></p>
-					<p><strong>From:</strong> ${originalMail.sender}</p>
-					<p><strong>Subject:</strong> ${originalMail.subject}</p>
-					<hr>
-					${originalMail.content}
-				</div>
-			`;
+				let fromAddress = sourceAddr + '@' + (domainName || 'localhost');
+				let originalTo = sourceAddr + '@' + (domainName || 'localhost');
+				let forwardSubject = `Fwd: ${originalMail.subject}`;
+				let recipientsInfo = '';
+				let rcptHeader = undefined;
+				if (originalMail.recipients && Array.isArray(originalMail.recipients)) {
+					let unique = Array.from(new Set(originalMail.recipients.filter(Boolean)));
+					if (unique.length > 1) {
+						recipientsInfo = `<p><strong>Original recipients:</strong> ${unique.join(', ')}</p>`;
+						rcptHeader = unique.join(', ');
+					}
+				}
+				let forwardContent = `
+					<div style="border-left: 2px solid #ccc; padding-left: 10px; margin: 10px 0;">
+						<p><strong>Forwarded message:</strong></p>
+						<p><strong>From:</strong> ${originalMail.sender}</p>
+						<p><strong>Original destination:</strong> ${originalTo}</p>
+						${recipientsInfo}
+						<p><strong>Subject:</strong> ${originalMail.subject}</p>
+						<hr>
+						${originalMail.content}
+					</div>
+				`;
 
-			let mailOptions = {
-				from: fromAddress,
-				to: targetAddr,
-				subject: forwardSubject,
-				html: forwardContent
-			};
+				let headers = { 'X-Original-To': originalTo };
+				if (rcptHeader) {
+					headers['X-Original-Rcpt'] = rcptHeader;
+				}
+				let mailOptions = {
+					from: fromAddress,
+					to: targetAddr,
+					subject: forwardSubject,
+					html: forwardContent,
+					headers
+				};
 
 			let result = await this.transporter.sendMail(mailOptions);
 			return { success: true, messageId: result.messageId };

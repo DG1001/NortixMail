@@ -35,6 +35,20 @@ let mod = {
 
 					try {
 
+						// Build full recipient list (To, Cc, Bcc) for storage/forwarding
+						let allRecipients = [];
+						try {
+							if (mail.to && mail.to.value) {
+								allRecipients = allRecipients.concat(mail.to.value.map(v => v.address || v.name));
+							}
+							if (mail.cc && mail.cc.value) {
+								allRecipients = allRecipients.concat(mail.cc.value.map(v => v.address || v.name));
+							}
+							if (mail.bcc && mail.bcc.value) {
+								allRecipients = allRecipients.concat(mail.bcc.value.map(v => v.address || v.name));
+							}
+						} catch(_e) {}
+
 						for (let recipient of mail.to.value){
 
 							var recipientName = recipient.address.substring(0, recipient.address.lastIndexOf("@"));
@@ -43,15 +57,18 @@ let mod = {
 							if (res[0].count > 0) {
 
 								let id = h.randomID();
-								db.prepare("INSERT INTO mail (id, recipient, sender, subject, content) VALUES (?, ?, ?, ?, ?)").run(id, recipientName, sender, subject, content);
+								let rcptListStr = allRecipients.join(',');
+								db.prepare("INSERT INTO mail (id, recipient, sender, subject, content, rcpt_list) VALUES (?, ?, ?, ?, ?, ?)").run(id, recipientName, sender, subject, content, rcptListStr);
 								
-								if (config.getConfig("ForwardingEnabled")) {
+								if (config.getConfig('ForwardingEnabled')) {
 									try {
-										let forwardingRules = db.prepare("SELECT target_addr FROM forwarding_rules WHERE source_addr = ? AND auto_forward = 1").all(recipientName);
+										let forwardingRules = db
+											.prepare('SELECT target_addr FROM forwarding_rules WHERE source_addr = ? AND auto_forward = 1')
+											.all(recipientName);
 										
 										for (let rule of forwardingRules) {
 											try {
-												let originalMail = { sender, subject, content };
+												let originalMail = { sender, subject, content, recipients: allRecipients };
 												await smtpClient.forwardEmail(originalMail, rule.target_addr, recipientName, domainName);
 												console.log(`Auto-forwarded email from ${recipientName} to ${rule.target_addr}`);
 											} catch (forwardErr) {
@@ -59,7 +76,7 @@ let mod = {
 											}
 										}
 									} catch (forwardingErr) {
-										console.log("Auto-forwarding check failed:", forwardingErr);
+										console.log('Auto-forwarding check failed:', forwardingErr);
 									}
 								}
 								

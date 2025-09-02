@@ -137,7 +137,7 @@ let mod = {
 
 			try {
 
-				let rows = db.prepare("SELECT sender, subject, content FROM mail WHERE id = ?").all(json.id);
+				let rows = db.prepare("SELECT sender, subject, content, rcpt_list FROM mail WHERE id = ?").all(json.id);
 				res.json(rows[0])
 
 			} catch(err) {
@@ -279,13 +279,17 @@ let mod = {
 
 			try {
 
-				let mailRows = db.prepare("SELECT sender, subject, content FROM mail WHERE id = ?").all(json.mailId);
+				let mailRows = db.prepare("SELECT sender, subject, content, rcpt_list FROM mail WHERE id = ?").all(json.mailId);
 				if(mailRows.length === 0){
 					return res.status(404).json({ error: "Mail not found" });
 				}
 
 				let currentDomain = domainName || req.headers.host.split(':')[0];
-				let result = await smtpClient.forwardEmail(mailRows[0], json.targetAddr, json.sourceAddr, currentDomain);
+				let original = mailRows[0];
+				if (original && original.rcpt_list) {
+					original.recipients = original.rcpt_list.split(',').map(s => s.trim()).filter(Boolean);
+				}
+				let result = await smtpClient.forwardEmail(original, json.targetAddr, json.sourceAddr, currentDomain);
 				
 				res.json({ success: true, messageId: result.messageId });
 

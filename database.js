@@ -29,6 +29,17 @@ let database = {
 
 			db.exec("CREATE TABLE IF NOT EXISTS mail (id TEXT NOT NULL, recipient TEXT NOT NULL, sender TEXT NOT NULL, subject TEXT NOT NULL, content TEXT NOT NULL)");
 
+			// Migration: add rcpt_list column if missing to store original recipients
+			try {
+				const cols = db.prepare("PRAGMA table_info(mail)").all();
+				const hasRcptList = cols.some(c => c.name === 'rcpt_list');
+				if (!hasRcptList) {
+					db.exec("ALTER TABLE mail ADD COLUMN rcpt_list TEXT");
+				}
+			} catch (_e) {
+				// ignore; DB may be readonly or migration not needed
+			}
+
 			db.exec(`CREATE TABLE IF NOT EXISTS sent_mails (
 				id TEXT PRIMARY KEY,
 				from_addr TEXT NOT NULL,
