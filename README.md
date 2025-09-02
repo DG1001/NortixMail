@@ -149,6 +149,16 @@ To enable email sending and forwarding, configure the outbound SMTP server in `d
 2. Enter the destination email address
 3. The email will be forwarded with "Fwd:" prefix and original content
 
+## Forwarded Message Details 📨
+- Body: includes a summary block with:
+  - Original destination: the exact address that received the mail (e.g., `info@sensem.de`)
+  - Original recipients: shown when the original message had multiple recipients (To/Cc/Bcc)
+  - Subject and original HTML content
+- Headers:
+  - `X-Original-To`: always set to the original destination address
+  - `X-Original-Rcpt`: set to a comma-separated list of original recipients when more than one
+- Domain source: we derive the original destination domain from the actual inbound recipient address. If unavailable, we fall back to the TLS certificate CN (if present) or `localhost`.
+
 ## Viewing Sent Emails 📤
 1. In the main interface, click the **"Sent"** tab
 2. View all emails sent from the selected disposable address
@@ -162,3 +172,6 @@ The current mail transfer protocol is very old and by default it doesn't require
 
 # Contributing 🤝
 This repository currently doesn't accept any pull request. However, you can open an issue if you want to request a feature, report bugs or ask me a question.
+
+## Upgrade Notes 🔧
+- A lightweight migration adds a new `rcpt_list` column to the `mail` table to store original recipients. The migration runs automatically on startup. Existing mails continue to work; only mails received after the upgrade will have `rcpt_list` populated.
