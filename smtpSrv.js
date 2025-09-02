@@ -69,7 +69,14 @@ let mod = {
 										for (let rule of forwardingRules) {
 											try {
 												let originalMail = { sender, subject, content, recipients: allRecipients };
-												await smtpClient.forwardEmail(originalMail, rule.target_addr, recipientName, domainName);
+												// Prefer the actual recipient domain from the inbound address
+												let inboundDomain = '';
+												try {
+													if (recipient && recipient.address && recipient.address.includes('@')) {
+														inboundDomain = recipient.address.split('@')[1];
+													}
+												} catch(_e) {}
+												await smtpClient.forwardEmail(originalMail, rule.target_addr, recipientName, inboundDomain || domainName);
 												console.log(`Auto-forwarded email from ${recipientName} to ${rule.target_addr}`);
 											} catch (forwardErr) {
 												console.log(`Auto-forward failed for ${recipientName} -> ${rule.target_addr}:`, forwardErr.message);

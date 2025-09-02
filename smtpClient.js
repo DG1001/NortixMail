@@ -102,7 +102,22 @@ let mod = {
 		try {
 
 				let fromAddress = sourceAddr + '@' + (domainName || 'localhost');
-				let originalTo = sourceAddr + '@' + (domainName || 'localhost');
+				// Derive the original destination domain from recipients if possible
+				let originalDomain = domainName || 'localhost';
+				try {
+					if (originalMail.recipients && Array.isArray(originalMail.recipients)) {
+						for (let r of originalMail.recipients) {
+							if (r && typeof r === 'string' && r.includes('@')) {
+								let [local, dom] = r.split('@');
+								if (local && dom && local.toLowerCase() === String(sourceAddr).toLowerCase()) {
+									originalDomain = dom;
+									break;
+								}
+							}
+						}
+					}
+				} catch(_e) {}
+				let originalTo = sourceAddr + '@' + originalDomain;
 				let forwardSubject = `Fwd: ${originalMail.subject}`;
 				let recipientsInfo = '';
 				let rcptHeader = undefined;
