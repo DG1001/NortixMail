@@ -365,6 +365,10 @@
 							<span>{mail.sender}</span>
 							<div></div>
 							<span>{mail.subject}</span>
+							{#if mail.received_at}
+								<div></div>
+								<small style="color: #6c757d;">{new Date(mail.received_at).toLocaleString()}</small>
+							{/if}
 
 						</div>
 

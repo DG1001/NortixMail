@@ -36,6 +36,11 @@ let database = {
 				if (!hasRcptList) {
 					db.exec("ALTER TABLE mail ADD COLUMN rcpt_list TEXT");
 				}
+
+				const hasReceivedAt = cols.some(c => c.name === 'received_at');
+				if (!hasReceivedAt) {
+					db.exec("ALTER TABLE mail ADD COLUMN received_at DATETIME DEFAULT CURRENT_TIMESTAMP");
+				}
 			} catch (_e) {
 				// ignore; DB may be readonly or migration not needed
 			}

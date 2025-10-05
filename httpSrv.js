@@ -119,7 +119,7 @@ let mod = {
 
 			try {
 
-				let rows = db.prepare("SELECT id, sender, subject FROM mail WHERE recipient = @recipient ORDER BY id DESC LIMIT @mailCount OFFSET (@page-1)*@mailCount").all({recipient: json.addr, page: json.page, mailCount: config.getConfig('MailCountPerPage')});
+				let rows = db.prepare("SELECT id, sender, subject, received_at FROM mail WHERE recipient = @recipient ORDER BY received_at DESC LIMIT @mailCount OFFSET (@page-1)*@mailCount").all({recipient: json.addr, page: json.page, mailCount: config.getConfig('MailCountPerPage')});
 				res.json(rows);
 
 			} catch(err) {
