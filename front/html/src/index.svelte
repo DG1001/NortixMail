@@ -157,8 +157,11 @@
 
 				waitForElement("#mailData").then((element)=>{
 
-					const shadowRoot = element.attachShadow({ mode: 'open' });
-					shadowRoot.innerHTML = data.content;
+					// Render in a sandboxed iframe: no script execution, no form
+					// submit, no popups, treated as a unique origin. Prevents
+					// stored-XSS via attacker-controlled mail HTML
+					// (<img onerror="...">, etc.).
+					element.srcdoc = data.content || "";
 
 				})
 
@@ -427,8 +430,8 @@
 					<hr>
 				</div>
 
-				<div id="mailData" style="all: initial; background-color: white; overflow: auto; flex: 1">
-				</div>
+				<iframe id="mailData" sandbox title="Mail content" style="background-color: white; overflow: auto; flex: 1; border: 0; width: 100%;">
+				</iframe>
 
 				<div style="height: 10px;"></div>
 				<div style="display: flex; gap: 10px;">
