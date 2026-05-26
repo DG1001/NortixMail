@@ -14,6 +14,17 @@ let mod = {
 
 		smtpClient.init();
 		let domainName = domain.getDomainName();
+		// Configurable allow-list of domains we accept incoming mail for.
+		// Falls back to the TLS-cert-derived domain when nothing is configured.
+		let configured = config.getConfig('LocalDomains');
+		let localDomains = Array.isArray(configured) && configured.length
+			? configured.map(d => String(d).toLowerCase())
+			: (domainName ? [domainName.toLowerCase()] : []);
+		if (localDomains.length === 0) {
+			console.log("WARNING: no LocalDomains configured and no cert-derived domain — refusing all inbound mail");
+		} else {
+			console.log("Accepting mail for local domains: " + localDomains.join(", "));
+		}
 
 		let opt = {
 
@@ -51,7 +62,16 @@ let mod = {
 
 						for (let recipient of mail.to.value){
 
-							var recipientName = recipient.address.substring(0, recipient.address.lastIndexOf("@"));
+							let atIdx = recipient.address.lastIndexOf("@");
+							if (atIdx < 0) { continue; }
+							// Only accept mail for our own domain(s) — prevents relay/spoofing
+							// where an attacker sends to "<localpart>@anywhere" and we'd
+							// store it (and possibly auto-forward) just because the local
+							// part exists in our address table.
+							let recipientDomain = recipient.address.substring(atIdx + 1).toLowerCase();
+							if (!localDomains.includes(recipientDomain)) { continue; }
+
+							var recipientName = recipient.address.substring(0, atIdx);
 							let res = db.prepare("SELECT COUNT(*) as count FROM address WHERE addr = ?").all(recipientName);
 
 							if (res[0].count > 0) {

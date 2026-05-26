@@ -11,7 +11,9 @@ let mod = {
 
 		const app = express();
 
-		app.use(express.json());
+		// Bound JSON body size to avoid memory-DoS via large requests
+		// (nginx already limits to 50M, but Express default is only 100k).
+		app.use(express.json({ limit: '10mb' }));
 		app.use(compression());
 		app.use(express.static('./front/html/dist'));
 
