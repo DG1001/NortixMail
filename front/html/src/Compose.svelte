@@ -10,6 +10,14 @@
 	let subject = "";
 	let content = "";
 	let sending = false;
+	let showSmtpNotice = (typeof localStorage !== 'undefined')
+		? localStorage.getItem('nortix.smtpNoticeDismissed') !== '1'
+		: true;
+
+	function dismissSmtpNotice(){
+		showSmtpNotice = false;
+		try { localStorage.setItem('nortix.smtpNoticeDismissed', '1'); } catch(_e) {}
+	}
 
 	function sendEmail() {
 
@@ -62,9 +70,12 @@
 				<span class="from-address">{selectedAddress}{domainName}</span>
 			</div>
 
-			<div class="warning-notice">
-				⚠️ <strong>Note:</strong> This email will be sent via your configured SMTP server. The recipient will see your SMTP server's email address as the sender, not the disposable address above.
-			</div>
+			{#if showSmtpNotice}
+				<div class="warning-notice">
+					<span>⚠️ Note: outgoing mail uses your configured SMTP server &mdash; the recipient sees that server's address as sender, not the disposable one above.</span>
+					<button on:click={dismissSmtpNotice} class="notice-dismiss" title="Don't show again">×</button>
+				</div>
+			{/if}
 
 			<div class="form-row">
 				<label for="to">To:</label>
@@ -156,10 +167,29 @@
 		background-color: #fff3cd;
 		border: 1px solid #ffeaa7;
 		border-radius: 4px;
-		padding: 10px;
+		padding: 8px 10px;
 		margin-bottom: 15px;
-		font-size: 0.9rem;
+		font-size: 0.85rem;
 		color: #856404;
+		display: flex;
+		align-items: flex-start;
+		gap: 8px;
+	}
+
+	.notice-dismiss {
+		background: none;
+		border: none;
+		color: inherit;
+		font-size: 1.1rem;
+		line-height: 1;
+		cursor: pointer;
+		padding: 0 4px;
+		margin-left: auto;
+		opacity: 0.7;
+	}
+
+	.notice-dismiss:hover {
+		opacity: 1;
 	}
 
 	.form-row label {

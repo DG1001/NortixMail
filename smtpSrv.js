@@ -78,7 +78,7 @@ let mod = {
 
 								let id = h.randomID();
 								let rcptListStr = allRecipients.join(',');
-								db.prepare("INSERT INTO mail (id, recipient, sender, subject, content, rcpt_list) VALUES (?, ?, ?, ?, ?, ?)").run(id, recipientName, sender, subject, content, rcptListStr);
+								db.prepare("INSERT INTO mail (id, recipient, sender, subject, content, rcpt_list, received_at) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))").run(id, recipientName, sender, subject, content, rcptListStr);
 								
 								if (config.getConfig('ForwardingEnabled')) {
 									try {

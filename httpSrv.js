@@ -121,8 +121,10 @@ let mod = {
 
 			try {
 
-				let rows = db.prepare("SELECT id, sender, subject FROM mail WHERE recipient = @recipient ORDER BY id DESC LIMIT @mailCount OFFSET (@page-1)*@mailCount").all({recipient: json.addr, page: json.page, mailCount: config.getConfig('MailCountPerPage')});
-				res.json(rows);
+				let mailCount = config.getConfig('MailCountPerPage');
+				let total = db.prepare("SELECT COUNT(*) as c FROM mail WHERE recipient = ?").get(json.addr).c;
+				let rows = db.prepare("SELECT id, sender, subject, received_at FROM mail WHERE recipient = @recipient ORDER BY received_at DESC, id DESC LIMIT @mailCount OFFSET (@page-1)*@mailCount").all({recipient: json.addr, page: json.page, mailCount: mailCount});
+				res.json({mails: rows, total: total, pageSize: mailCount});
 
 			} catch(err) {
 
@@ -199,8 +201,10 @@ let mod = {
 
 			try {
 
-				let rows = db.prepare("SELECT id, to_addr, subject, sent_at FROM sent_mails WHERE from_addr = @fromAddr ORDER BY sent_at DESC LIMIT @mailCount OFFSET (@page-1)*@mailCount").all({fromAddr: json.addr, page: json.page, mailCount: config.getConfig('MailCountPerPage')});
-				res.json(rows);
+				let mailCount = config.getConfig('MailCountPerPage');
+				let total = db.prepare("SELECT COUNT(*) as c FROM sent_mails WHERE from_addr = ?").get(json.addr).c;
+				let rows = db.prepare("SELECT id, to_addr, subject, sent_at FROM sent_mails WHERE from_addr = @fromAddr ORDER BY sent_at DESC LIMIT @mailCount OFFSET (@page-1)*@mailCount").all({fromAddr: json.addr, page: json.page, mailCount: mailCount});
+				res.json({mails: rows, total: total, pageSize: mailCount});
 
 			} catch(err) {
 

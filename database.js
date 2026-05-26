@@ -29,12 +29,18 @@ let database = {
 
 			db.exec("CREATE TABLE IF NOT EXISTS mail (id TEXT NOT NULL, recipient TEXT NOT NULL, sender TEXT NOT NULL, subject TEXT NOT NULL, content TEXT NOT NULL)");
 
-			// Migration: add rcpt_list column if missing to store original recipients
+			// Migrations on the mail table
 			try {
 				const cols = db.prepare("PRAGMA table_info(mail)").all();
 				const hasRcptList = cols.some(c => c.name === 'rcpt_list');
 				if (!hasRcptList) {
 					db.exec("ALTER TABLE mail ADD COLUMN rcpt_list TEXT");
+				}
+				const hasReceivedAt = cols.some(c => c.name === 'received_at');
+				if (!hasReceivedAt) {
+					// SQLite refuses CURRENT_TIMESTAMP as ALTER TABLE default
+					// (non-constant). Add nullable and set explicitly on INSERT.
+					db.exec("ALTER TABLE mail ADD COLUMN received_at DATETIME");
 				}
 			} catch (_e) {
 				// ignore; DB may be readonly or migration not needed

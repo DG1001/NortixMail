@@ -13,6 +13,9 @@
 	let mails = [];
 	let sentMails = [];
 	let page = 1;
+	let totalMails = 0;
+	let pageSize = 10;
+	$: totalPages = Math.max(1, Math.ceil(totalMails / pageSize));
 	let viewType = "overview"; // "mails", "sent", "mailData", "overview"
 	let showCompose = false;
 	let addressOverview = [];
@@ -25,14 +28,34 @@
 
 		if (viewType === "sent") {
 			f.fetchPost('/sentMails', {addr: selectedAddress, page: page}, (data) => {
-				sentMails = data;
+				sentMails = data.mails || [];
+				totalMails = data.total || 0;
+				pageSize = data.pageSize || pageSize;
 			});
 		} else {
 			f.fetchPost('/mails', {addr: selectedAddress, page: page}, (data) => {
-				mails = data;
+				mails = data.mails || [];
+				totalMails = data.total || 0;
+				pageSize = data.pageSize || pageSize;
 			});
 		}
 
+	}
+
+	// Pretty-print a SQLite-stored UTC timestamp ("YYYY-MM-DD HH:MM:SS") in
+	// local time, using a relative form for recent items and a short
+	// absolute form (with date+time) for older ones.
+	function fmtTime(ts){
+		if (!ts) return "";
+		// SQLite CURRENT_TIMESTAMP gives UTC without "Z"; force it.
+		let d = new Date(ts.replace(' ', 'T') + 'Z');
+		if (isNaN(d.getTime())) return "";
+		let diff = (Date.now() - d.getTime()) / 1000;
+		if (diff < 60) return "just now";
+		if (diff < 3600) return Math.floor(diff/60) + " min ago";
+		if (diff < 86400) return Math.floor(diff/3600) + "h ago";
+		if (diff < 86400*7) return Math.floor(diff/86400) + "d ago";
+		return d.toLocaleDateString() + " " + d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 	}
 
 	function showSentEmails(){
@@ -206,23 +229,17 @@
 	}
 
 	function nextPage(){
-
-		let currentList = viewType === "sent" ? sentMails : mails;
-		if(currentList.length > 0){
+		if (page < totalPages) {
 			page += 1;
 			refreshMails();
 		}
 	}
 
 	function prevPage(){
-		
-		if(page > 1){
-
+		if (page > 1) {
 			page -= 1;
 			refreshMails();
-	
 		}
-
 	}
 
 	onMount(() => {
@@ -359,26 +376,28 @@
 			
 			{#if viewType == 'mails'}
 
+				{#if mails.length === 0}
+					<div class="empty-list">No emails for this address yet.</div>
+				{/if}
+
 				{#each mails as mail}
 
-					<div data-id={mail.id} on:keypress={mailClicked} on:click={mailClicked} role="button" tabindex="0" class="clickable" style="display: flex; align-items: center; justify-content: space-between">
+					<div data-id={mail.id} on:keypress={mailClicked} on:click={mailClicked} role="button" tabindex="0" class="clickable mail-row">
 
-						<div> 
-
-							<span>{mail.sender}</span>
-							<div></div>
-							<span>{mail.subject}</span>
-
+						<div class="mail-row-main">
+							<span class="mail-sender">{mail.sender}</span>
+							<span class="mail-subject">{mail.subject}</span>
 						</div>
 
-						<div style="display: flex; gap: 10px; align-items: center;">
-							<button on:click={(e) => {e.stopPropagation(); forwardEmail(mail.id);}} style="padding: 5px 10px; font-size: 0.8rem;">Forward</button>
-							<input data-id={mail.id} on:keypress={deleteClicked} on:click={deleteClicked} type="image" src="trashIcon.svg" alt="X" style="width: 2rem; height: 2rem; padding: 1rem">
+						<div class="mail-row-meta">
+							{#if mail.received_at}
+								<small class="mail-time" title={new Date(mail.received_at.replace(' ', 'T') + 'Z').toLocaleString()}>{fmtTime(mail.received_at)}</small>
+							{/if}
+							<input data-id={mail.id} on:keypress={deleteClicked} on:click={deleteClicked} type="image" src="trashIcon.svg" alt="Delete" title="Delete this email" class="trash-btn">
 						</div>
 
 					</div>
-					
-					<!--hr size inside flex is 0, gotta wrap with div, not sure why-->
+
 					<div>
 						<hr>
 					</div>
@@ -389,23 +408,22 @@
 
 			{#if viewType == 'sent'}
 
+				{#if sentMails.length === 0}
+					<div class="empty-list">No sent emails from this address yet.</div>
+				{/if}
+
 				{#each sentMails as mail}
 
-					<div style="display: flex; align-items: center; justify-content: space-between; padding: 10px;">
-
-						<div> 
-
-							<span><strong>To:</strong> {mail.to_addr}</span>
-							<div></div>
-							<span>{mail.subject}</span>
-							<div></div>
-							<small style="color: #666;">{new Date(mail.sent_at).toLocaleString()}</small>
-
+					<div class="mail-row">
+						<div class="mail-row-main">
+							<span class="mail-sender"><strong>To:</strong> {mail.to_addr}</span>
+							<span class="mail-subject">{mail.subject}</span>
 						</div>
-
+						<div class="mail-row-meta">
+							<small class="mail-time" title={new Date(mail.sent_at.replace(' ', 'T') + 'Z').toLocaleString()}>{fmtTime(mail.sent_at)}</small>
+						</div>
 					</div>
-					
-					<!--hr size inside flex is 0, gotta wrap with div, not sure why-->
+
 					<div>
 						<hr>
 					</div>
@@ -443,11 +461,13 @@
 
 		</div>
 
-		<div>
-			<button class="counter" on:click={prevPage}>❮</button>
-			<span>{page}</span>
-			<button class="counter" on:click={nextPage}>❯</button>
-		</div>
+		{#if viewType === 'mails' || viewType === 'sent'}
+			<div class="pager">
+				<button class="counter" on:click={prevPage} disabled={page <= 1}>❮</button>
+				<span class="page-info">Page {page} of {totalPages}</span>
+				<button class="counter" on:click={nextPage} disabled={page >= totalPages}>❯</button>
+			</div>
+		{/if}
 
 		<button on:click={()=>{window.location.replace('/manage.html')}} class="adaptWidthSmall">Manage addresses</button>
 
@@ -574,6 +594,89 @@
 		background-color: #0056b3;
 	}
 
+	.mail-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+		padding: 8px 4px;
+	}
+
+	.mail-row-main {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.mail-sender {
+		font-weight: 600;
+		font-size: 0.95rem;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.mail-subject {
+		font-size: 0.9rem;
+		color: #444;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.mail-row-meta {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-shrink: 0;
+	}
+
+	.mail-time {
+		color: #6c757d;
+		font-size: 0.8rem;
+		white-space: nowrap;
+	}
+
+	.trash-btn {
+		width: 1.4rem;
+		height: 1.4rem;
+		padding: 6px;
+		box-sizing: content-box;
+		opacity: 0.6;
+	}
+
+	.trash-btn:hover {
+		opacity: 1;
+	}
+
+	.empty-list {
+		padding: 30px 10px;
+		text-align: center;
+		color: #6c757d;
+		font-style: italic;
+	}
+
+	.pager {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		justify-content: center;
+	}
+
+	.page-info {
+		font-size: 0.9rem;
+		color: #555;
+		min-width: 6em;
+		text-align: center;
+	}
+
+	.counter:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
+
 	@media (prefers-color-scheme: dark) {
 		.tab-btn {
 			background-color: #333;
@@ -626,6 +729,22 @@
 		.forwarding-none {
 			background-color: #3f0f0f;
 			color: #ffb3b3;
+		}
+
+		.mail-subject {
+			color: #bbb;
+		}
+
+		.mail-time {
+			color: #999;
+		}
+
+		.empty-list {
+			color: #888;
+		}
+
+		.page-info {
+			color: #bbb;
 		}
 	}
 </style>
