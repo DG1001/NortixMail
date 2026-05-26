@@ -1,6 +1,8 @@
 {
     "MailCountPerPage": 10,
     "MailRefreshInterval": 3,
+    "SmtpPort": 25,
+    "HttpPort": 80,
     "SMTPOutbound": {
         "host": "smtp.example.com",
         "port": 587,

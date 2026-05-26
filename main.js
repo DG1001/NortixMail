@@ -9,5 +9,11 @@ config.init();
 let db = database.init();
 let domainName = domain.getDomainName();
 
-smtpSrv.start(db, 25);
-httpSrv.start(db, domainName, 80);
+// Ports can be overridden via config (useful when running behind a
+// reverse proxy that listens on 80/443 itself). ENV wins over config
+// wins over the default.
+let smtpPort = parseInt(process.env.SMTP_PORT) || config.getConfig('SmtpPort') || 25;
+let httpPort = parseInt(process.env.HTTP_PORT) || config.getConfig('HttpPort') || 80;
+
+smtpSrv.start(db, smtpPort);
+httpSrv.start(db, domainName, httpPort);
